@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- STEP 3 SETUP: Scale Grid (60 Squares, 10 Columns) ---
   const scaleGrid = document.getElementById('scale-grid');
   if (scaleGrid) {
+    scaleGrid.innerHTML = '';
     for (let i = 0; i < 60; i++) {
       const square = document.createElement('div');
       square.classList.add('scale-square');
@@ -64,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
   ]);
 
   if (filterGrid) {
+    filterGrid.innerHTML = '';
     for (let i = 0; i < 40; i++) {
       const square = document.createElement('div');
       square.classList.add('filter-square');
@@ -72,7 +74,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Animation trigger trackers so animations run once per section
+  // Explicit starting states before animation trigger
+  const countEl = document.getElementById('scale-count');
+  if (countEl) countEl.textContent = '0';
+
+  const filterCounterEl = document.getElementById('filter-counter');
+  if (filterCounterEl) filterCounterEl.textContent = '0 of 40 kept';
+
+  // Animation trigger trackers
   const stepTriggered = {
     step2: false,
     step3: false,
@@ -81,10 +90,11 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // --- INTERSECTION OBSERVER SETUP ---
+  // Adjusted rootMargin and threshold so cards trigger when most of the card is on screen
   const observerOptions = {
     root: null,
-    rootMargin: '0px',
-    threshold: 0.3
+    rootMargin: '0px 0px -20% 0px',
+    threshold: 0.6
   };
 
   const observer = new IntersectionObserver((entries) => {
@@ -95,21 +105,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (prefersReducedMotion) {
           triggerReducedMotionState(id);
+          observer.unobserve(entry.target);
           return;
         }
 
         if (id === 'step-2' && !stepTriggered.step2) {
           stepTriggered.step2 = true;
-          animateStep2();
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            animateStep2();
+          }, 300);
         } else if (id === 'step-3' && !stepTriggered.step3) {
           stepTriggered.step3 = true;
-          animateStep3();
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            animateStep3();
+          }, 300);
         } else if (id === 'step-4' && !stepTriggered.step4) {
           stepTriggered.step4 = true;
-          animateStep4();
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            animateStep4();
+          }, 300);
         } else if (id === 'step-5' && !stepTriggered.step5) {
           stepTriggered.step5 = true;
-          animateStep5();
+          observer.unobserve(entry.target);
+          setTimeout(() => {
+            animateStep5();
+          }, 300);
         }
       }
     });
@@ -133,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Step 3: Scale animation (Counter 0 to 500+ and 60 squares fill with amber)
   function animateStep3() {
-    const countEl = document.getElementById('scale-count');
+    const scaleCountEl = document.getElementById('scale-count');
     const squares = document.querySelectorAll('.scale-square');
     const totalDuration = 1800; // ms
     const totalSquares = squares.length;
@@ -146,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const progress = Math.min((timestamp - startTime) / totalDuration, 1);
 
       const currentCount = Math.floor(progress * targetCount);
-      if (countEl) countEl.textContent = currentCount;
+      if (scaleCountEl) scaleCountEl.textContent = currentCount;
 
       const filledCount = Math.floor(progress * totalSquares);
       squares.forEach((sq, idx) => {
@@ -158,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (progress < 1) {
         requestAnimationFrame(step);
       } else {
-        if (countEl) countEl.textContent = '500';
+        if (scaleCountEl) scaleCountEl.textContent = '500';
       }
     }
 
@@ -199,8 +222,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (stepId === 'step-2') {
       document.querySelectorAll('#step-2 .check-item').forEach(item => item.classList.add('active'));
     } else if (stepId === 'step-3') {
-      const countEl = document.getElementById('scale-count');
-      if (countEl) countEl.textContent = '500';
+      const scaleCountEl = document.getElementById('scale-count');
+      if (scaleCountEl) scaleCountEl.textContent = '500';
       document.querySelectorAll('.scale-square').forEach(sq => sq.classList.add('filled'));
     } else if (stepId === 'step-4') {
       document.querySelectorAll('.filter-square').forEach((sq, idx) => {
