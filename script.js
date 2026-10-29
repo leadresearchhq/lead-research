@@ -1,4 +1,7 @@
-// Lead Research HQ - Scroll Animations & Qualification Mini-Game
+// Lead Research HQ - Main Script
+
+// Turnaround time constant for outreach page (can be changed as needed)
+const DELIVERY_TIME = "48 hours";
 
 document.addEventListener('DOMContentLoaded', () => {
   // Check for prefers-reduced-motion
@@ -7,18 +10,23 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- OUTREACH PAGE PERSONALIZATION LOGIC ---
   const companyLabel = document.getElementById('company-label');
   const replyBtn = document.getElementById('reply-btn');
+  const deliveryTimeEl = document.getElementById('delivery-time-val');
+
+  if (deliveryTimeEl) {
+    deliveryTimeEl.textContent = DELIVERY_TIME;
+  }
 
   if (companyLabel || replyBtn) {
     const urlParams = new URLSearchParams(window.location.search);
     let companyParam = urlParams.get('company');
 
-    let companyName = 'you';
+    let companyName = '';
     let labelText = 'MADE FOR YOU';
 
     if (companyParam) {
       companyParam = companyParam.trim();
       if (companyParam.length > 0) {
-        // Cut to 40 characters
+        // Cut to 40 characters maximum
         companyParam = companyParam.slice(0, 40);
         companyName = companyParam;
         labelText = `MADE FOR ${companyParam.toUpperCase()}`;
@@ -26,26 +34,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (companyLabel) {
+      // Use textContent only for safety
       companyLabel.textContent = labelText;
     }
 
     if (replyBtn) {
       const email = 'leadresearchhq@gmail.com';
-      const subject = `Pilot for ${companyName}`;
+      const subject = companyName ? `Pilot for ${companyName}` : 'Pilot request';
       replyBtn.href = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
     }
   }
 
-  // Initialize Card Animation State Trackers
-  const stepTriggered = {
-    step1: false,
-    step2: false,
-    step3: false,
-    step4: false,
-    step5: false
-  };
-
-  // --- STEP 3 SETUP: Scale Grid (60 Squares) ---
+  // --- STEP 3 SETUP: Scale Grid (60 Squares, 10 Columns) ---
   const scaleGrid = document.getElementById('scale-grid');
   if (scaleGrid) {
     for (let i = 0; i < 60; i++) {
@@ -55,9 +55,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // --- STEP 4 SETUP: Filter Grid (40 Squares) ---
+  // --- STEP 4 SETUP: Filter Grid (40 Squares, 8 Columns) ---
   const filterGrid = document.getElementById('filter-grid');
-  // Define which of the 40 squares are kept (approx 28 kept, 12 removed)
+  // 28 kept squares, 12 removed squares
   const keptIndices = new Set([
     0, 1, 2, 4, 5, 6, 7, 8, 9, 11, 12, 13, 15, 16, 17, 18,
     20, 21, 22, 24, 25, 27, 28, 29, 31, 33, 34, 37
@@ -72,11 +72,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Animation trigger trackers so animations run once per section
+  const stepTriggered = {
+    step2: false,
+    step3: false,
+    step4: false,
+    step5: false
+  };
+
   // --- INTERSECTION OBSERVER SETUP ---
   const observerOptions = {
     root: null,
     rootMargin: '0px',
-    threshold: 0.35
+    threshold: 0.3
   };
 
   const observer = new IntersectionObserver((entries) => {
@@ -86,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const id = entry.target.id;
 
         if (prefersReducedMotion) {
-          // Immediately complete animations if reduced motion is requested
           triggerReducedMotionState(id);
           return;
         }
@@ -108,15 +115,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }, observerOptions);
 
-  document.querySelectorAll('.card-step').forEach(card => {
+  document.querySelectorAll('section.card').forEach(card => {
     observer.observe(card);
   });
 
-  // --- ANIMATION LOGIC FOR STEPS ---
+  // --- ANIMATION FUNCTIONS ---
 
-  // Step 2: Verify Checklist animation (ticks on one by one)
+  // Step 2: Verification Checklist tick-on one by one
   function animateStep2() {
-    const checkItems = document.querySelectorAll('.check-item');
+    const checkItems = document.querySelectorAll('#step-2 .check-item');
     checkItems.forEach((item, index) => {
       setTimeout(() => {
         item.classList.add('active');
@@ -124,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Step 3: Scale animation (Counter 0 to 500+ and 60 squares fill)
+  // Step 3: Scale animation (Counter 0 to 500+ and 60 squares fill with amber)
   function animateStep3() {
     const countEl = document.getElementById('scale-count');
     const squares = document.querySelectorAll('.scale-square');
@@ -138,11 +145,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!startTime) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / totalDuration, 1);
 
-      // Update count
       const currentCount = Math.floor(progress * targetCount);
       if (countEl) countEl.textContent = currentCount;
 
-      // Fill squares proportionally
       const filledCount = Math.floor(progress * totalSquares);
       squares.forEach((sq, idx) => {
         if (idx < filledCount) {
@@ -160,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(step);
   }
 
-  // Step 4: Filter animation (some turn green, others shrink & fade)
+  // Step 4: Filter animation (28 turn green, 12 shrink and fade)
   function animateStep4() {
     const squares = document.querySelectorAll('.filter-square');
     const counterEl = document.getElementById('filter-counter');
@@ -179,9 +184,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Step 5: Deliver Spreadsheet (5 rows slide in sequentially)
+  // Step 5: Deliver Spreadsheet (5 rows slide in sequential order)
   function animateStep5() {
-    const rows = document.querySelectorAll('.sheet-row');
+    const rows = document.querySelectorAll('#step-5 .sheet-row');
     rows.forEach((row, index) => {
       setTimeout(() => {
         row.classList.add('visible');
@@ -189,17 +194,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Fallback / Reduced motion helper
+  // Fallback for prefers-reduced-motion
   function triggerReducedMotionState(stepId) {
     if (stepId === 'step-2') {
-      document.querySelectorAll('.check-item').forEach(item => item.classList.add('active'));
+      document.querySelectorAll('#step-2 .check-item').forEach(item => item.classList.add('active'));
     } else if (stepId === 'step-3') {
       const countEl = document.getElementById('scale-count');
       if (countEl) countEl.textContent = '500';
       document.querySelectorAll('.scale-square').forEach(sq => sq.classList.add('filled'));
     } else if (stepId === 'step-4') {
-      const squares = document.querySelectorAll('.filter-square');
-      squares.forEach((sq, idx) => {
+      document.querySelectorAll('.filter-square').forEach((sq, idx) => {
         if (keptIndices.has(idx)) {
           sq.classList.add('kept');
         } else {
@@ -209,52 +213,37 @@ document.addEventListener('DOMContentLoaded', () => {
       const counterEl = document.getElementById('filter-counter');
       if (counterEl) counterEl.textContent = `${keptIndices.size} of 40 kept`;
     } else if (stepId === 'step-5') {
-      document.querySelectorAll('.sheet-row').forEach(row => row.classList.add('visible'));
+      document.querySelectorAll('#step-5 .sheet-row').forEach(row => row.classList.add('visible'));
     }
   }
 
-  // --- STEP 6: MINI GAME LOGIC ---
+  // --- STEP 6: MINI GAME LOGIC ("Qualify the list") ---
 
-  // Lead Data Pool
-  const nichesPool = [
-    { title: 'Online Fitness Coach', valid: true },
-    { title: 'Online PT', valid: true },
-    { title: 'Nutrition Coach', valid: true },
-    { title: 'SaaS Founder', valid: false },
-    { title: 'Real Estate Agent', valid: false },
-    { title: 'Life Coach', valid: false },
-    { title: 'Crypto Trader', valid: false },
-    { title: 'E-commerce Brand', valid: false }
-  ];
+  const validNiches = ['Online Fitness Coach', 'Online PT', 'Nutrition Coach'];
+  const invalidNiches = ['SaaS Founder', 'Real Estate Agent', 'Life Coach', 'Crypto Trader', 'E-commerce Brand'];
 
   const contactPool = [
-    { text: 'found (email & phone)', valid: true },
-    { text: 'found (IG DM)', valid: true },
-    { text: 'missing', valid: false },
-    { text: 'not available', valid: false }
+    { text: 'found', valid: true },
+    { text: 'missing', valid: false }
   ];
 
   const postPool = [
     { text: '2 days ago', valid: true },
     { text: '1 day ago', valid: true },
     { text: '5 hours ago', valid: true },
-    { text: '3 weeks ago', valid: true },
     { text: '5 months ago', valid: false },
-    { text: '1 year ago', valid: false },
-    { text: 'Never', valid: false }
+    { text: '1 year ago', valid: false }
   ];
 
   const firstNames = ['Alex', 'Sarah', 'Jordan', 'Taylor', 'Chris', 'Morgan', 'Sam', 'David', 'Jessica', 'Michael', 'Emma', 'Daniel'];
   const lastInitials = ['M.', 'K.', 'R.', 'S.', 'T.', 'B.', 'W.', 'L.', 'P.'];
 
-  // Game state
   let score = 0;
   let timer = 30;
   let timerInterval = null;
   let currentLead = null;
   let gameActive = false;
 
-  // Game UI elements
   const gameStartScreen = document.getElementById('game-start-screen');
   const gamePlayScreen = document.getElementById('game-play-screen');
   const gameOverScreen = document.getElementById('game-over-screen');
@@ -276,16 +265,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function generateRandomLead() {
     const name = `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastInitials[Math.floor(Math.random() * lastInitials.length)]}`;
-    const nicheObj = nichesPool[Math.floor(Math.random() * nichesPool.length)];
+
+    // 50% chance valid niche, 50% chance invalid niche
+    const isNicheValid = Math.random() < 0.5;
+    const nicheList = isNicheValid ? validNiches : invalidNiches;
+    const niche = nicheList[Math.floor(Math.random() * nicheList.length)];
+
     const contactObj = contactPool[Math.floor(Math.random() * contactPool.length)];
     const postObj = postPool[Math.floor(Math.random() * postPool.length)];
 
-    // Rule: Fitness Coach / Online PT / Nutrition Coach AND contact found AND recent post
-    const isValid = nicheObj.valid && contactObj.valid && postObj.valid;
+    // Qualification rule: niche is fitness coach/online PT/nutrition coach AND contact is found AND post is recent
+    const isValid = isNicheValid && contactObj.valid && postObj.valid;
 
     return {
       name,
-      niche: nicheObj.title,
+      niche,
       contact: contactObj.text,
       post: postObj.text,
       isValid
@@ -303,7 +297,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function handlePlayerChoice(action) {
     if (!gameActive || !currentLead) return;
 
-    // action is 'keep' or 'skip'
     const isKeep = (action === 'keep');
     const isCorrect = (isKeep === currentLead.isValid);
 
@@ -381,7 +374,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Event Listeners for Game Buttons
   if (startGameBtn) startGameBtn.addEventListener('click', startGame);
   if (restartGameBtn) restartGameBtn.addEventListener('click', startGame);
 
