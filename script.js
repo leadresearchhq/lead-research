@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (replyBtn) {
-      const email = 'hello@leadresearchhq.com';
+      const email = 'leadresearchhq@gmail.com';
       const subject = `Pilot for ${companyName}`;
       replyBtn.href = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
     }
