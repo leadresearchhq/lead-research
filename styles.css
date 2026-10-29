@@ -1,0 +1,642 @@
+/* Lead Research HQ - Mobile-first Sticky Stack Cards CSS */
+
+:root {
+  --bg-color: #0f1114;
+  --card-bg: #1a1d23;
+  --card-border: rgba(255, 255, 255, 0.08);
+  --text-main: #f0f2f5;
+  --text-muted: #8a8f9d;
+  --amber: #f5a623;
+  --amber-glow: rgba(245, 166, 35, 0.2);
+  --green: #3ecf8e;
+  --green-glow: rgba(62, 207, 142, 0.2);
+  --red: #e5484d;
+  --red-glow: rgba(229, 72, 77, 0.2);
+  --card-radius: 32px;
+  --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: var(--font-system);
+  line-height: 1.4;
+  width: 100%;
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+  scroll-behavior: smooth;
+  /* NO overflow: hidden here or on parent containers */
+}
+
+body {
+  padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Header */
+.top-nav {
+  position: relative;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: calc(12px + env(safe-area-inset-top, 0px)) 20px 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  background: rgba(15, 17, 20, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+}
+
+.logo-text span {
+  color: var(--amber);
+}
+
+/* Stack Container */
+.stack-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 12px 16px 40px 16px;
+  max-width: 480px;
+  margin: 0 auto;
+  /* Crucial: DO NOT put overflow: hidden here */
+}
+
+/* Sticky Card Step */
+.card-step {
+  position: sticky;
+  /* Stacks near top with 10px incremental offset for each card */
+  top: calc(env(safe-area-inset-top, 0px) + 56px + (var(--card-index) * 10px));
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  /* Fits nicely inside one iPhone screen height */
+  min-height: 480px;
+  max-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden; /* Local card overflow hidden for diagonal stripe */
+  margin-bottom: 24px;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  will-change: transform, opacity;
+}
+
+/* Faint Amber Diagonal Stripe in Top Right Corner */
+.card-stripe {
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, transparent 40%, rgba(245, 166, 35, 0.15) 50%, rgba(245, 166, 35, 0.35) 55%, transparent 65%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Card Inner Content */
+.card-content {
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  z-index: 2;
+  position: relative;
+}
+
+.card-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.card-title {
+  font-size: 1.65rem;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.03em;
+  color: var(--text-main);
+  margin-bottom: 20px;
+}
+
+.card-title .amber {
+  color: var(--amber);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 24px;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.btn-amber {
+  background-color: var(--amber);
+  color: #0d0e11;
+  box-shadow: 0 4px 16px var(--amber-glow);
+}
+
+.btn-amber:active {
+  transform: scale(0.97);
+  background-color: #e0951d;
+}
+
+.btn-large {
+  width: 100%;
+  padding: 18px 24px;
+  font-size: 1.1rem;
+}
+
+.btn-skip {
+  background-color: rgba(229, 72, 77, 0.15);
+  color: var(--red);
+  border: 1px solid rgba(229, 72, 77, 0.3);
+  flex: 1;
+}
+
+.btn-skip:active {
+  background-color: rgba(229, 72, 77, 0.3);
+}
+
+.btn-keep {
+  background-color: rgba(62, 207, 142, 0.15);
+  color: var(--green);
+  border: 1px solid rgba(62, 207, 142, 0.3);
+  flex: 1;
+}
+
+.btn-keep:active {
+  background-color: rgba(62, 207, 142, 0.3);
+}
+
+/* Step 1: Start (Profile Card) */
+.profile-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.profile-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--amber), #e07b00);
+  color: #000;
+  font-weight: 800;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.profile-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.profile-role {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.profile-meta {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.badge-accent {
+  background: var(--amber-glow);
+  color: var(--amber);
+  border: 1px solid rgba(245, 166, 35, 0.3);
+}
+
+/* Step 2: Verify Checklist */
+.verify-box {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.profile-card-mini {
+  padding: 12px 16px;
+}
+
+.profile-card-mini .profile-avatar {
+  width: 40px;
+  height: 40px;
+  font-size: 1rem;
+}
+
+.verify-checklist {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 14px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  opacity: 0.3;
+  transform: translateX(-10px);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.check-item.active {
+  opacity: 1;
+  transform: translateX(0);
+  background: rgba(62, 207, 142, 0.08);
+  border-color: rgba(62, 207, 142, 0.25);
+}
+
+.check-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 800;
+  transition: all 0.3s ease;
+}
+
+.check-item.active .check-icon {
+  background: var(--green);
+  color: #000;
+}
+
+/* Step 3: Scale Visual */
+.scale-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  margin-bottom: auto;
+  width: 100%;
+}
+
+.scale-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 6px;
+  width: 100%;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.scale-square {
+  aspect-ratio: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.scale-square.filled {
+  background: var(--amber);
+  box-shadow: 0 0 6px var(--amber-glow);
+}
+
+/* Step 4: Filter Visual */
+.filter-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: rgba(245, 166, 35, 0.12);
+  color: var(--amber);
+  border: 1px solid rgba(245, 166, 35, 0.25);
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.filter-square {
+  aspect-ratio: 1;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  transition: all 0.4s ease;
+}
+
+.filter-square.kept {
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green-glow);
+  transform: scale(1);
+  opacity: 1;
+}
+
+.filter-square.removed {
+  background: rgba(229, 72, 77, 0.2);
+  transform: scale(0.4);
+  opacity: 0.15;
+}
+
+.filter-counter {
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* Step 5: Deliver Spreadsheet */
+.sheet-container {
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.25);
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.sheet-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.sheet-table th {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  font-weight: 600;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+}
+
+.sheet-table td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.sheet-row {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: all 0.4s ease;
+}
+
+.sheet-row.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.tag-green {
+  background: rgba(62, 207, 142, 0.15);
+  color: var(--green);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.fit-val {
+  color: var(--amber);
+  font-weight: 700;
+}
+
+/* Step 6: Mini Game */
+.game-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 280px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.game-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.game-screen.hidden {
+  display: none !important;
+}
+
+.game-desc {
+  font-size: 1rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 0 4px;
+}
+
+.game-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+}
+
+.game-card.flash-green {
+  border-color: var(--green);
+  box-shadow: 0 0 20px var(--green-glow);
+  transform: scale(1.02);
+}
+
+.game-card.flash-red {
+  border-color: var(--red);
+  box-shadow: 0 0 20px var(--red-glow);
+  transform: scale(0.98);
+}
+
+.game-lead-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--amber);
+  margin-bottom: 4px;
+}
+
+.game-lead-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+}
+
+.game-label {
+  color: var(--text-muted);
+}
+
+.game-val {
+  font-weight: 600;
+}
+
+.game-controls {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.game-final-score {
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-align: center;
+  color: var(--amber);
+}
+
+.game-feedback {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+/* Step 7: CTA */
+.card-content-cta {
+  text-align: center;
+  justify-content: space-between;
+}
+
+.cta-subtitle {
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+}
+
+.cta-actions {
+  margin-top: auto;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.footer-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: auto;
+}
+
+/* Entrance fade-up animations triggered by IntersectionObserver */
+.card-step {
+  opacity: 0.4;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.card-step.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Prefers Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .card-step,
+  .check-item,
+  .sheet-row,
+  .filter-square,
+  .scale-square,
+  .btn {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
