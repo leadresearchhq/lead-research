@@ -4,6 +4,38 @@ document.addEventListener('DOMContentLoaded', () => {
   // Check for prefers-reduced-motion
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // --- OUTREACH PAGE PERSONALIZATION LOGIC ---
+  const companyLabel = document.getElementById('company-label');
+  const replyBtn = document.getElementById('reply-btn');
+
+  if (companyLabel || replyBtn) {
+    const urlParams = new URLSearchParams(window.location.search);
+    let companyParam = urlParams.get('company');
+
+    let companyName = 'you';
+    let labelText = 'MADE FOR YOU';
+
+    if (companyParam) {
+      companyParam = companyParam.trim();
+      if (companyParam.length > 0) {
+        // Cut to 40 characters
+        companyParam = companyParam.slice(0, 40);
+        companyName = companyParam;
+        labelText = `MADE FOR ${companyParam.toUpperCase()}`;
+      }
+    }
+
+    if (companyLabel) {
+      companyLabel.textContent = labelText;
+    }
+
+    if (replyBtn) {
+      const email = 'hello@leadresearchhq.com';
+      const subject = `Pilot for ${companyName}`;
+      replyBtn.href = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
+    }
+  }
+
   // Initialize Card Animation State Trackers
   const stepTriggered = {
     step1: false,
@@ -133,7 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const squares = document.querySelectorAll('.filter-square');
     const counterEl = document.getElementById('filter-counter');
     let keptCount = 0;
-    const totalKeptTarget = keptIndices.size; // 28
 
     squares.forEach((sq, idx) => {
       setTimeout(() => {
